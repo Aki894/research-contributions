@@ -43,7 +43,7 @@ parser.add_argument(
 )
 parser.add_argument("--save_checkpoint", action="store_true", help="save checkpoint during training")
 parser.add_argument("--max_epochs", default=1000, type=int, help="max number of training epochs")
-parser.add_argument("--batch_size", default=2, type=int, help="number of batch size")
+parser.add_argument("--batch_size", default=4, type=int, help="number of batch size")
 parser.add_argument("--sw_batch_size", default=1, type=int, help="number of sliding window batch size")
 parser.add_argument("--optim_lr", default=1e-4, type=float, help="optimization learning rate")
 parser.add_argument("--optim_name", default="adamw", type=str, help="optimization algorithm")
@@ -56,9 +56,9 @@ parser.add_argument("--world_size", default=1, type=int, help="number of nodes f
 parser.add_argument("--rank", default=0, type=int, help="node rank for distributed training")
 parser.add_argument("--dist-url", default="tcp://127.0.0.1:23456", type=str, help="distributed url")
 parser.add_argument("--dist-backend", default="nccl", type=str, help="distributed backend")
-parser.add_argument("--workers", default=2, type=int, help="number of workers")
+parser.add_argument("--workers", default=8, type=int, help="number of workers")
 parser.add_argument("--model_name", default="unetr", type=str, help="model name")
-parser.add_argument("--pos_embed", default="perceptron", type=str, help="type of position embedding")
+# parser.add_argument("--pos_embed", default="perceptron", type=str, help="type of position embedding")
 parser.add_argument("--norm_name", default="instance", type=str, help="normalization layer type in decoder")
 parser.add_argument("--num_heads", default=12, type=int, help="number of attention heads in ViT encoder")
 parser.add_argument("--mlp_dim", default=3072, type=int, help="mlp dimention in ViT encoder")
@@ -134,7 +134,7 @@ def main_worker(gpu, args):
             hidden_size=args.hidden_size,
             mlp_dim=args.mlp_dim,
             num_heads=args.num_heads,
-            pos_embed=args.pos_embed,
+            # pos_embed=args.pos_embed,
             norm_name=args.norm_name,
             conv_block=True,
             res_block=True,
@@ -157,8 +157,8 @@ def main_worker(gpu, args):
     dice_loss = DiceCELoss(
         to_onehot_y=True, softmax=True, squared_pred=True, smooth_nr=args.smooth_nr, smooth_dr=args.smooth_dr
     )
-    post_label = AsDiscrete(to_onehot=True, n_classes=args.out_channels)
-    post_pred = AsDiscrete(argmax=True, to_onehot=True, n_classes=args.out_channels)
+    post_label = AsDiscrete(to_onehot=args.out_channels)
+    post_pred = AsDiscrete(argmax=True, to_onehot=args.out_channels)
     dice_acc = DiceMetric(include_background=True, reduction=MetricReduction.MEAN, get_not_nans=True)
     model_inferer = partial(
         sliding_window_inference,
