@@ -43,7 +43,7 @@ parser.add_argument(
 )
 parser.add_argument("--save_checkpoint", action="store_true", help="save checkpoint during training")
 parser.add_argument("--max_epochs", default=1000, type=int, help="max number of training epochs")
-parser.add_argument("--batch_size", default=4, type=int, help="number of batch size")
+parser.add_argument("--batch_size", default=1, type=int, help="number of batch size")
 parser.add_argument("--sw_batch_size", default=1, type=int, help="number of sliding window batch size")
 parser.add_argument("--optim_lr", default=1e-4, type=float, help="optimization learning rate")
 parser.add_argument("--optim_name", default="adamw", type=str, help="optimization algorithm")
